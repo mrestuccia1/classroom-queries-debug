@@ -1,6 +1,7 @@
 class CoursesController < ApplicationController
   def index
     @courses = Course.all.order({ :created_at => :desc })
+    @departments = Department.all.order({ :created_at => :desc })
 
     render({ :template => "courses/index" })
   end
@@ -15,8 +16,8 @@ class CoursesController < ApplicationController
   def create
     @course = Course.new
     @course.title = params.fetch("query_title")
-    @course.term_offered = params.fetch("query_term_")
-    @course.department_id = params.fetch("query_department_id")
+    @course.term_offered = params.fetch("query_term")
+    @course.department_id = params[:query_department_id].to_i
 
     if @course.valid?
       @course.save
@@ -28,7 +29,7 @@ class CoursesController < ApplicationController
 
   def update
     id = params.fetch("path_id")
-    @course = Course.where({ :id => the_id }).at(0)
+    @course = Course.where({ :id => id }).at(0)
 
     @course.title = params.fetch("query_title")
     @course.term_offered = params.fetch("query_term_offered")
@@ -36,18 +37,18 @@ class CoursesController < ApplicationController
 
     if @course.valid?
       @course.save
-      redirect_to("/courses/#{@course.id}", { :notice => "Course updated successfully."} )
+      redirect_to("/courses/#{@course.id}", { :notice => "Course updated successfully." })
     else
       redirect_to("/courses/#{@course.id}", { :alert => "Course failed to update successfully." })
     end
   end
 
   def destroy
-    the_id = params.fetch("path")
+    the_id = params.fetch("path_id")
     @course = Course.where({ :id => the_id }).at(0)
 
     @course.destroy
 
-    redirect_to("/courses", { :notice => "Course deleted successfully."} )
+    redirect_to("/courses", { :notice => "Course deleted successfully." })
   end
 end
